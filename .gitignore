@@ -1,3 +1,11 @@
+
+BackupScripts/Library
+BackupScripts/Assets
+BackupScripts/ProjectSettings
+BackupScripts/Temp
+BackupScripts/obj
+BackupScripts/Builds
+BackupScripts/builds
 /[Ll]ibrary/
 /[Tt]emp/
 /[Oo]bj/
