@@ -7,40 +7,55 @@ public class PlayerControl : MonoBehaviour {
     Collider playerCollider;
     Vector3 strafeDirection;
     Vector3 moveDirection;
-    Vector3 lookDirection;
     Vector3 mousePosition;
     Vector3 lastDirection;
+    Quaternion lookRotation;
+    PlayerCameraScript cameraScript;
 
     public float walkSpeed;
     public float strafeSpeed;
     public float jumpSpeed;
-    public float jumpReduceMove;
     public float gravity;
-    public bool pause; //handles pausing and unpausing off player controls
+    public float lookSpeed;
+
+    bool pause; //handles pausing and unpausing off player controls
 
     float distToGround;
     float verticalSpeed;
+    float mouseXLook = 0.0f;
 
-	void Start () {
+   
+
+    void Start () {
         playerCollider = GetComponent<Collider>();
         controller = GetComponent<CharacterController>();
-
+        cameraScript = GetComponent<PlayerCameraScript>();
+  
         distToGround = playerCollider.bounds.extents.y;// distance from the centre of the player collider to the bottom/top
     }
 	
     void FixedUpdate()
-    {
-         Movement();
+    {   
+        
+            Movement();
+        
+
+         
     }
 
-     //MOVEMENT CONTROL
+ //MOVEMENT CONTROL
   void Movement()
     {
-       
-        transform.LookAt(lookDirection);
-        transform.rotation = Quaternion.Euler(new Vector3(0, transform.eulerAngles.y, 0)); //keeps the character on the level
-        moveDirection = (transform.forward * Input.GetAxis("Vertical") * walkSpeed);
-        strafeDirection = (transform.right * Input.GetAxisRaw("Horizontal") * strafeSpeed);
+        if (!Input.GetMouseButton(1))
+        {
+            //LOOKDIRECTION
+            mouseXLook += lookSpeed * Input.GetAxis("Mouse X");
+            transform.eulerAngles = new Vector3(0.0f, mouseXLook, 0.0f);
+            //transform.eulerAngles = Vector3.Lerp(transform.eulerAngles, new Vector3(0.0f, mouseXLook, 0.0f),(lookSpeed * Time.fixedDeltaTime)) ;
+        }
+        //MOVEDIRECTION
+        moveDirection = (transform.forward*Input.GetAxis("Vertical") * walkSpeed);
+        strafeDirection = (transform.right* Input.GetAxisRaw("Horizontal") * strafeSpeed);
         if (IsGrounded())
         {
             verticalSpeed = 0;
@@ -53,7 +68,7 @@ public class PlayerControl : MonoBehaviour {
         }
         else
         {
-            moveDirection = lastDirection; //stops player changing direction while in midair                    
+           // moveDirection = lastDirection; //stops player changing direction while in midair                    
             strafeDirection =  Vector3.zero;
         }
 
@@ -64,12 +79,7 @@ public class PlayerControl : MonoBehaviour {
         controller.Move(strafeDirection *Time.fixedDeltaTime); //strafe
     }
 
-    public void MousePosition(Vector3 mousePoint) //recieves mouse position
-    {
-        mousePosition = mousePoint;
-        lookDirection = new Vector3(mousePosition.x, 1f, mousePosition.z); //the 1 is so the head keeps level, still a little buggy up close        
-    }
-    
+
 
    bool IsGrounded()
     {
@@ -86,4 +96,11 @@ public class PlayerControl : MonoBehaviour {
     {
         pause = false;
     }
+
+    //public void MousePosition(Vector3 mousePoint) //recieves mouse position
+    //{
+    //    mousePosition = mousePoint;
+    //    lookDirection = new Vector3(mousePosition.x, 1f, mousePosition.z); //the 1 is so the head keeps level, still a little buggy up close        
+    //}
+
 }
