@@ -51,8 +51,8 @@ public class PlayerControl : MonoBehaviour {
             //LOOKDIRECTION
             mouseXLook += lookSpeed * Input.GetAxis("Mouse X");
             transform.eulerAngles = new Vector3(0.0f, mouseXLook, 0.0f);
-            //transform.eulerAngles = Vector3.Lerp(transform.eulerAngles, new Vector3(0.0f, mouseXLook, 0.0f),(lookSpeed * Time.fixedDeltaTime)) ;
         }
+
         //MOVEDIRECTION
         moveDirection = (transform.forward*Input.GetAxis("Vertical") * walkSpeed);
         strafeDirection = (transform.right* Input.GetAxisRaw("Horizontal") * strafeSpeed);
@@ -97,10 +97,6 @@ public class PlayerControl : MonoBehaviour {
         pause = false;
     }
 
-    //public void MousePosition(Vector3 mousePoint) //recieves mouse position
-    //{
-    //    mousePosition = mousePoint;
-    //    lookDirection = new Vector3(mousePosition.x, 1f, mousePosition.z); //the 1 is so the head keeps level, still a little buggy up close        
-    //}
+
 
 }
