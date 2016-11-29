@@ -3,11 +3,12 @@ using System.Collections;
 
 public class PlayerCameraScript : MonoBehaviour
 {
-    public Transform player;
+    Transform player;
 
     public float cameraHeight;
     public float followDistance;
-    public float rotationSpeed; 
+    public float rotationSpeed;
+    public float distance;
 
     Vector3 mainPosition;
     Vector3 mainRotation;
@@ -18,12 +19,15 @@ public class PlayerCameraScript : MonoBehaviour
     float angleX;
     float angleY;
     float radius;
-    float distance;
+ 
 
     int wallLayerMask;
+
+
 /*******THE CAMERA MUST BE A CHILD OF THE PLAYER AND BE SET AT 0,0,0*******/
     void Start()
     {
+        player = transform.root; //parent transform
         //Mouse Orbit
         transform.localPosition = new Vector3(0f, cameraHeight, -followDistance);
         transform.LookAt(player);
@@ -40,7 +44,7 @@ public class PlayerCameraScript : MonoBehaviour
 
     void FixedUpdate()
     {       
-        CameraCast();
+        //CameraCast();
     }
 
     void LateUpdate()
@@ -65,8 +69,7 @@ public class PlayerCameraScript : MonoBehaviour
         angleX *= Mathf.Deg2Rad;
         angleY *= Mathf.Deg2Rad;
         transform.localPosition = radius * (new Vector3( Mathf.Cos(angleX), Mathf.Tan(angleY), Mathf.Sin(angleX)));
-       
-        
+             
         //what its based off of
         //X= originX + cos(angle) * radius;
         //Y= originY + sin(angle) * radius; (which is Z in our case)
@@ -80,49 +83,36 @@ public class PlayerCameraScript : MonoBehaviour
     }
 
 
+    //CAMERARAYCAST
+  //  void CameraCast()
+  //  {
+  //      RaycastHit[] hits;
+  //      hits = Physics.RaycastAll(transform.position, transform.forward, distance, wallLayerMask);
 
-    void CameraCast()
-    {
-        Ray cameraRay = new Ray(transform.position, transform.forward);
-        RaycastHit hit;
-        Debug.DrawLine(transform.position, player.position, Color.red);
-        if (Physics.Raycast(cameraRay, out hit, distance, wallLayerMask))
-        {
-            print("Hitting Walls"); 
-            Renderer rend = hit.transform.GetComponent<Renderer>();
-            if (rend)
-            {
-                rend.material.shader = Shader.Find("Transparent/Diffuse");
-                Color tempColor = rend.material.color;
-                tempColor.a = 0.3F;
-                rend.material.color = tempColor;
-            }
-        }
-            
-        else
-            print("I'm looking at nothing!");
-    }
+  //      for (int i = 0; i < hits.Length; i++)
+  //      {
+  //          RaycastHit hit = hits[i];
+  //          Renderer rend = hit.transform.GetComponent<Renderer>();
 
+  //          if (rend)            
+  //              StartCoroutine(Fade(rend));          
+  //      }
+  //  }
 
-
-    //void Update()
-    //{
-    //    if (Input.GetKeyDown("f"))
-    //    {
-    //        StartCoroutine("Fade");
-    //    }
-    //}
-
-    //IEnumerator Fade()
-    //{
-    //    for (float f = 1f; f >= 0; f -= 0.1f)
-    //    {
-    //        Color c = renderer.material.color;
-    //        c.a = f;
-    //        renderer.material.color = c;
-    //        yield return null;
-    //    }
-    //}
+  //IEnumerator Fade(Renderer rend)
+  //  {
+  //      float fadePercent = 1f;
+  //      float fadeTime = 3f;
+  //      rend.material.shader = Shader.Find("Transparent/Diffuse");
+  //      Color tempColor = rend.material.color;
+  //      while (fadePercent >= 0.3f)
+  //      {
+  //          fadePercent -= (0.1f * Time.deltaTime*fadeTime);
+  //          tempColor.a = fadePercent;
+  //          rend.material.color = tempColor;
+  //          yield return null;
+  //      }  
+  //  }
 }
 
 
