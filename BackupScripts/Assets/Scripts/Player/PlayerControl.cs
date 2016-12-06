@@ -3,83 +3,84 @@ using System.Collections;
 
 public class PlayerControl : MonoBehaviour {
 
+    LedgeController ledgeScript;
     CharacterController controller;
+    Animator animator;
     Collider playerCollider;
     Vector3 strafeDirection;
     Vector3 moveDirection;
     Vector3 mousePosition;
     Vector3 lastDirection;
+    Vector3 lastStrafeDirection;
     Quaternion lookRotation;
-    PlayerCameraScript cameraScript;
 
     public float walkSpeed;
     public float strafeSpeed;
     public float jumpSpeed;
     public float gravity;
     public float lookSpeed;
+    public bool inAir;
 
     bool pause; //handles pausing and unpausing off player controls
+
 
     float distToGround;
     float verticalSpeed;
     float mouseXLook = 0.0f;
 
-   
 
     void Start () {
         playerCollider = GetComponent<Collider>();
-        controller = GetComponent<CharacterController>();
-        cameraScript = GetComponent<PlayerCameraScript>();
-  
+        controller = GetComponent<CharacterController>();  
+        animator = GetComponent<Animator>();
+        ledgeScript = GetComponentInChildren<LedgeController>();
+
         distToGround = playerCollider.bounds.extents.y;// distance from the centre of the player collider to the bottom/top
+
+        //Pause Subscriptions -- Testing this kind of method of unpausing/ pausing the game for now
+        ledgeScript.OnLedgeEvent += Pause;
+        ledgeScript.OffLedgeEvent += Unpause;   
     }
 	
     void FixedUpdate()
-    {   
-        
+    {   if(!pause)
             Movement();
-        
-
-         
+ 
     }
 
  //MOVEMENT CONTROL
-  void Movement()
+    void Movement()
     {
-        if (!Input.GetMouseButton(1))
-        {
-            //LOOKDIRECTION
+        //LOOKDIRECTION
+        if (!Input.GetMouseButton(1)) // if not in mouse orbit
+        {           
             mouseXLook += lookSpeed * Input.GetAxis("Mouse X");
             transform.eulerAngles = new Vector3(0.0f, mouseXLook, 0.0f);
         }
 
-        //MOVEDIRECTION
         moveDirection = (transform.forward*Input.GetAxis("Vertical") * walkSpeed);
         strafeDirection = (transform.right* Input.GetAxisRaw("Horizontal") * strafeSpeed);
+
         if (IsGrounded())
         {
+            inAir = false;
             verticalSpeed = 0;
-            if (Input.GetButton("Jump"))//spacebar
-            {
+            if (Input.GetButton("Jump"))//spacebar           
                 verticalSpeed = jumpSpeed;
 
-            }
             lastDirection = moveDirection;
+            lastStrafeDirection = strafeDirection;
         }
-        else
-        {
-           // moveDirection = lastDirection; //stops player changing direction while in midair                    
-            strafeDirection =  Vector3.zero;
-        }
-
-        verticalSpeed -= gravity * Time.fixedDeltaTime;        //apply constant gravity to smooth the fall zomg looks so reals
+        else       
+            inAir = true;
+        
+        //Apply Movement Decisions
+        verticalSpeed -= gravity * Time.fixedDeltaTime;   //apply constant gravity to smooth the fall zomg looks so reals
         moveDirection.y = verticalSpeed;
         strafeDirection.y = verticalSpeed;
         controller.Move(moveDirection*Time.fixedDeltaTime); //forward/back
         controller.Move(strafeDirection *Time.fixedDeltaTime); //strafe
     }
-
-
 
    bool IsGrounded()
     {
@@ -94,7 +95,8 @@ public class PlayerControl : MonoBehaviour {
 
     public void Unpause()
     {
-        pause = false;
+              pause = false;
+        mouseXLook =  transform.eulerAngles.y; //added in to account for movement changes during the pause 
     }
 
 

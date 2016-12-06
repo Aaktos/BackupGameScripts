@@ -7,16 +7,10 @@ public class PlayerScript : MonoBehaviour {
 
     PlayerControl playerControl;
     
-    
-
 	void Start () {
         playerControl = GetComponent<PlayerControl>();        
 	}
 
-
-    void Update()
-    {              
-    }
 
 }
 
